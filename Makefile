@@ -5,14 +5,14 @@ start:
 	@pm2 start
 
 restart:
-	@pm2 restart gcp-billing-api
+	@pm2 restart moon-api
 
 recreate:
-	@pm2 delete gcp-billing-api
+	@pm2 delete moon-api
 	@pm2 start
 
 delete:
-	@pm2 delete gcp-billing-api
+	@pm2 delete moon-api
 
 clean-branches:
 	@git --no-pager branch HG-* --list --format "%(refname:short)" \

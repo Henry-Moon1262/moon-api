@@ -1,6 +1,6 @@
 module.exports = {
   apps: [{
-    name: 'gcp-billing-api',
+    name: 'moon-api',
     script: 'src/index.js',
     instances: 1,
     autorestart: true,

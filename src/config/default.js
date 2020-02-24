@@ -7,7 +7,7 @@ module.exports = {
         etag: false,
     },
     gcp: {
-        projectId: 'gcp-billing-224808',
+        projectId: 'moon-api-269204',
     },
     apiCache: {
         enabled: false,
