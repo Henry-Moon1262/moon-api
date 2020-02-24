@@ -1,0 +1,20 @@
+--------------------------------------------------
+-- alter
+--------------------------------------------------
+
+-- add tel,description column to user table
+alter table gcp_billing.user add column tel varchar
+(30) null;
+alter table gcp_billing.user add column remark varchar
+(1000) null;
+
+-- drop tel,description column to user table
+
+-- alter table gcp_billing.user drop column tel;
+-- alter table gcp_billing.user drop column remark;
+
+
+--------------------------------------------------
+-- rollback
+--------------------------------------------------
+

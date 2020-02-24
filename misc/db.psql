@@ -1,0 +1,282 @@
+CREATE SCHEMA gcp_billing AUTHORIZATION postgres;
+
+-- Drop table
+
+-- DROP TABLE gcp_billing.account
+
+CREATE TABLE gcp_billing.account (
+	id varchar(20) NOT NULL,
+	"name" varchar(100) NOT NULL,
+	created_at timestamp NOT NULL DEFAULT now(),
+	updated_at timestamp NOT NULL DEFAULT now(),
+	description varchar(1000) NOT NULL,
+	CONSTRAINT account_pk PRIMARY KEY (id)
+);
+
+-- Drop table
+
+-- DROP TABLE gcp_billing."aggregate"
+
+CREATE TABLE gcp_billing."aggregate" (
+	account_id varchar(20) NOT NULL,
+	"month" varchar(6) NOT NULL,
+	"type" varchar(20) NOT NULL,
+	kind varchar(50) NOT NULL,
+	"data" json NOT NULL,
+	created_at timestamp NOT NULL DEFAULT now(),
+	CONSTRAINT aggregate_pk PRIMARY KEY (account_id, month, type, kind)
+);
+
+-- Drop table
+
+-- DROP TABLE gcp_billing.country
+
+CREATE TABLE gcp_billing.country (
+	id varchar(2) NOT NULL,
+	"name" varchar(200) NOT NULL,
+	CONSTRAINT country_pk PRIMARY KEY (id)
+);
+
+-- Drop table
+
+-- DROP TABLE gcp_billing.credit_daily
+
+CREATE TABLE gcp_billing.credit_daily (
+	account_id varchar(20) NOT NULL,
+	project_id varchar(50) NOT NULL,
+	service_id varchar(20) NOT NULL,
+	sku_id varchar(20) NOT NULL,
+	invoice_month varchar(6) NOT NULL,
+	usage_date date NOT NULL,
+	credit_name varchar(200) NOT NULL,
+	credit float8 NOT NULL,
+	created_at timestamp NOT NULL DEFAULT now(),
+	updated_at timestamp NOT NULL DEFAULT now(),
+	CONSTRAINT credit_daily_pk PRIMARY KEY (account_id, project_id, service_id, sku_id, invoice_month, usage_date, credit_name)
+);
+CREATE INDEX credit_daily_invoice_month_idx ON gcp_billing.credit_daily USING btree (invoice_month);
+
+-- Drop table
+
+-- DROP TABLE gcp_billing.credit_monthly
+
+CREATE TABLE gcp_billing.credit_monthly (
+	account_id varchar(20) NOT NULL,
+	project_id varchar(50) NOT NULL,
+	service_id varchar(20) NOT NULL,
+	sku_id varchar(20) NOT NULL,
+	invoice_month varchar(6) NOT NULL,
+	credit_name varchar(200) NOT NULL,
+	credit float8 NOT NULL,
+	usage_start_date date NOT NULL,
+	usage_end_date date NOT NULL,
+	created_at timestamp NOT NULL DEFAULT now(),
+	CONSTRAINT credit_monthly_pk PRIMARY KEY (account_id, project_id, service_id, sku_id, invoice_month, credit_name)
+);
+CREATE INDEX credit_monthly_invoice_month_idx ON gcp_billing.credit_monthly USING btree (invoice_month);
+
+-- Drop table
+
+-- DROP TABLE gcp_billing.gcp_invoice
+
+CREATE TABLE gcp_billing.gcp_invoice (
+	"no" int8 NOT NULL,
+	issued_date date NOT NULL,
+	due_date date NOT NULL,
+	currency varchar(3) NOT NULL,
+	"cost" numeric NOT NULL,
+	invoice_month varchar(6) NOT NULL,
+	billing_id varchar NOT NULL,
+	created_at timestamp NOT NULL DEFAULT now(),
+	CONSTRAINT gcp_invoice_pk PRIMARY KEY (no)
+);
+CREATE UNIQUE INDEX gcp_invoice_invoice_month_idx ON gcp_billing.gcp_invoice USING btree (invoice_month);
+
+-- Drop table
+
+-- DROP TABLE gcp_billing.gcp_invoice_item
+
+CREATE TABLE gcp_billing.gcp_invoice_item (
+	gcp_invoice_no int8 NOT NULL,
+	account_name varchar NULL,
+	account_id varchar NULL,
+	project_name varchar NULL,
+	project_id varchar NULL,
+	service_name varchar NULL,
+	sku_name varchar NULL,
+	sku_id varchar NULL,
+	description varchar NULL,
+	start_date date NULL,
+	end_date date NULL,
+	usage_unit varchar NULL,
+	"cost" numeric NULL,
+	usage_amount numeric NULL,
+	created_at timestamp NOT NULL DEFAULT now()
+);
+CREATE INDEX gcp_invoice_item_gcp_invoice_no_idx ON gcp_billing.gcp_invoice_item USING btree (gcp_invoice_no);
+
+-- Drop table
+
+-- DROP TABLE gcp_billing."group"
+
+CREATE TABLE gcp_billing."group" (
+	seq serial NOT NULL,
+	"name" varchar(100) NOT NULL,
+	description varchar(1000) NOT NULL,
+	created_at timestamp NOT NULL DEFAULT now(),
+	updated_at timestamp NOT NULL DEFAULT now(),
+	CONSTRAINT group_pk PRIMARY KEY (seq),
+	CONSTRAINT group_un_name UNIQUE (name)
+);
+
+-- Drop table
+
+-- DROP TABLE gcp_billing.group_account
+
+CREATE TABLE gcp_billing.group_account (
+	group_seq int4 NOT NULL,
+	account_id varchar(20) NOT NULL,
+	CONSTRAINT group_account_pk PRIMARY KEY (group_seq, account_id)
+);
+
+-- Drop table
+
+-- DROP TABLE gcp_billing.group_user
+
+CREATE TABLE gcp_billing.group_user (
+	group_seq int4 NOT NULL,
+	user_seq int4 NOT NULL,
+	CONSTRAINT group_user_pk PRIMARY KEY (group_seq, user_seq)
+);
+
+-- Drop table
+
+-- DROP TABLE gcp_billing.invoice
+
+CREATE TABLE gcp_billing.invoice (
+	seq bigserial NOT NULL,
+	account_id varchar(20) NOT NULL,
+	"month" varchar(6) NOT NULL,
+	ref_id varchar NOT NULL,
+	"data" json NOT NULL,
+	created_at timestamp NOT NULL DEFAULT now(),
+	updated_at timestamp NOT NULL DEFAULT now(),
+	total_cost numeric NOT NULL,
+	CONSTRAINT invoice_pk PRIMARY KEY (seq),
+	CONSTRAINT invoice_un UNIQUE (account_id, month)
+);
+
+-- Drop table
+
+-- DROP TABLE gcp_billing.project
+
+CREATE TABLE gcp_billing.project (
+	id varchar(50) NOT NULL,
+	"name" varchar(50) NOT NULL,
+	account_id varchar(20) NOT NULL,
+	created_at timestamp NOT NULL DEFAULT now(),
+	updated_at timestamp NOT NULL DEFAULT now(),
+	CONSTRAINT project_pk PRIMARY KEY (id)
+);
+CREATE INDEX project_account_id_idx ON gcp_billing.project USING btree (account_id);
+
+-- Drop table
+
+-- DROP TABLE gcp_billing.service
+
+CREATE TABLE gcp_billing.service (
+	id varchar(20) NOT NULL,
+	"name" varchar(100) NOT NULL,
+	created_at timestamp NOT NULL DEFAULT now(),
+	updated_at timestamp NOT NULL DEFAULT now(),
+	CONSTRAINT service_pk PRIMARY KEY (id)
+);
+
+-- Drop table
+
+-- DROP TABLE gcp_billing.sku
+
+CREATE TABLE gcp_billing.sku (
+	id varchar(20) NOT NULL,
+	"name" varchar(200) NOT NULL,
+	created_at timestamp NOT NULL DEFAULT now(),
+	updated_at timestamp NOT NULL DEFAULT now(),
+	CONSTRAINT sku_pk PRIMARY KEY (id)
+);
+
+-- Drop table
+
+-- DROP TABLE gcp_billing.usage_daily
+
+CREATE TABLE gcp_billing.usage_daily (
+	account_id varchar(20) NOT NULL,
+	project_id varchar(50) NOT NULL,
+	service_id varchar(20) NOT NULL,
+	sku_id varchar(20) NOT NULL,
+	invoice_month varchar(6) NOT NULL,
+	"location" varchar(30) NOT NULL,
+	country varchar(2) NOT NULL,
+	region varchar(30) NOT NULL,
+	"zone" varchar(30) NOT NULL,
+	cost_type varchar(30) NOT NULL,
+	usage_unit varchar(30) NOT NULL,
+	usage_date date NOT NULL,
+	"usage" float8 NOT NULL,
+	"cost" float8 NOT NULL,
+	credit float8 NOT NULL,
+	created_at timestamp NOT NULL DEFAULT now(),
+	updated_at timestamp NOT NULL DEFAULT now(),
+	CONSTRAINT usage_daily_pk PRIMARY KEY (account_id, project_id, service_id, sku_id, invoice_month, location, country, region, zone, cost_type, usage_unit, usage_date)
+);
+CREATE INDEX usage_daily_invoice_month_idx ON gcp_billing.usage_daily USING btree (invoice_month);
+
+-- Drop table
+
+-- DROP TABLE gcp_billing.usage_monthly
+
+CREATE TABLE gcp_billing.usage_monthly (
+	account_id varchar(20) NOT NULL,
+	project_id varchar(50) NOT NULL,
+	service_id varchar(20) NOT NULL,
+	sku_id varchar(20) NOT NULL,
+	invoice_month varchar(6) NOT NULL,
+	"location" varchar(30) NOT NULL,
+	country varchar(2) NOT NULL,
+	region varchar(30) NOT NULL,
+	"zone" varchar(30) NOT NULL,
+	cost_type varchar(30) NOT NULL,
+	usage_unit varchar(30) NOT NULL,
+	"usage" float8 NOT NULL,
+	"cost" float8 NOT NULL,
+	credit float8 NOT NULL,
+	usage_start_date date NOT NULL,
+	usage_end_date date NOT NULL,
+	created_at timestamp NOT NULL DEFAULT now(),
+	CONSTRAINT usage_monthly_pk PRIMARY KEY (account_id, project_id, service_id, sku_id, invoice_month, location, country, region, zone, cost_type, usage_unit)
+);
+CREATE INDEX usage_monthly_invoice_month_idx ON gcp_billing.usage_monthly USING btree (invoice_month);
+
+-- Drop table
+
+-- DROP TABLE gcp_billing."user"
+
+CREATE TABLE gcp_billing."user" (
+	seq serial NOT NULL,
+	email varchar(254) NOT NULL,
+	created_at timestamp NOT NULL DEFAULT now(),
+	updated_at timestamp NOT NULL DEFAULT now(),
+	"name" varchar(100) NOT NULL,
+	picture varchar(1000) NOT NULL,
+	CONSTRAINT user_pk PRIMARY KEY (seq),
+	CONSTRAINT user_un_email UNIQUE (email)
+);
+
+-- Drop table
+
+-- DROP TABLE gcp_billing.group_permission
+
+CREATE TABLE gcp_billing.group_permission (
+	group_seq int4 NOT NULL,
+	permission_id varchar(50) NOT NULL,
+	CONSTRAINT group_permission_pk PRIMARY KEY (group_seq, permission_id)
+);

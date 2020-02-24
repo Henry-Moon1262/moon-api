@@ -1,0 +1,59 @@
+--------------------------------------------------
+-- alter
+--------------------------------------------------
+
+-- alter table gcp_billing.usage_daily
+alter table gcp_billing.usage_daily
+	add column t_system_machine_spec varchar(100) not null,
+	add column t_system_cores varchar(100) not null,
+	add column t_system_memory varchar(100) not null,
+	add column t_user_owner varchar(100) not null,
+	add column t_user_project varchar(100) not null,
+	add column t_user_server varchar(100) not null,
+	add column t_user_status varchar(100) not null,
+	add column t_user_user varchar(100) not null,
+	add column t_user_application varchar(100) not null,
+	add column t_user_name varchar(100) not null,
+	add column t_user_service varchar(100) not null,
+	add column t_user_environment varchar(100) not null,
+	add column t_user_phase varchar(100) not null,
+	add column t_user_role varchar(100) not null,
+	add column t_user_revision varchar(100) not null,
+	add column t_user_team varchar(100) not null;
+
+alter table gcp_billing.usage_daily drop constraint usage_daily_pk;
+
+alter table gcp_billing.usage_daily add constraint usage_daily_pk PRIMARY KEY (
+	account_id, project_id, service_id, sku_id, invoice_month, location, country, region, zone, cost_type, usage_unit, usage_date,
+	t_system_machine_spec, t_system_cores, t_system_memory, t_user_owner, t_user_project, t_user_server, t_user_status, t_user_user,
+	t_user_application, t_user_name, t_user_service, t_user_environment, t_user_phase, t_user_role, t_user_revision, t_user_team);
+
+-- alter table gcp_billing.usage_monthly
+alter table gcp_billing.usage_monthly
+	add column t_system_machine_spec varchar(100) not null,
+	add column t_system_cores varchar(100) not null,
+	add column t_system_memory varchar(100) not null,
+	add column t_user_owner varchar(100) not null,
+	add column t_user_project varchar(100) not null,
+	add column t_user_server varchar(100) not null,
+	add column t_user_status varchar(100) not null,
+	add column t_user_user varchar(100) not null,
+	add column t_user_application varchar(100) not null,
+	add column t_user_name varchar(100) not null,
+	add column t_user_service varchar(100) not null,
+	add column t_user_environment varchar(100) not null,
+	add column t_user_phase varchar(100) not null,
+	add column t_user_role varchar(100) not null,
+	add column t_user_revision varchar(100) not null,
+	add column t_user_team varchar(100) not null;
+
+alter table gcp_billing.usage_monthly drop constraint usage_monthly_pk;
+
+alter table gcp_billing.usage_monthly add constraint usage_monthly_pk PRIMARY KEY (
+	account_id, project_id, service_id, sku_id, invoice_month, location, country, region, zone, cost_type, usage_unit,
+	t_system_machine_spec, t_system_cores, t_system_memory, t_user_owner, t_user_project, t_user_server, t_user_status, t_user_user,
+	t_user_application, t_user_name, t_user_service, t_user_environment, t_user_phase, t_user_role, t_user_revision, t_user_team);
+
+--------------------------------------------------
+-- rollback
+--------------------------------------------------

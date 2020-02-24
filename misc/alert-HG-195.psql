@@ -1,0 +1,42 @@
+--------------------------------------------------
+-- alter
+--------------------------------------------------
+
+-- invoice_credit
+
+ALTER TABLE gcp_billing.invoice_credit
+	ADD currency varchar(5) NOT NULL DEFAULT 'USD';
+
+-- invoice
+
+ALTER TABLE gcp_billing.invoice
+	ADD currency varchar(5) NOT NULL DEFAULT 'USD',
+	ADD original_costs json NULL;
+
+UPDATE gcp_billing.invoice i
+SET currency = c.charge_currency
+FROM gcp_billing.contract c
+WHERE i.contract_seq = c.seq
+	AND i.currency != c.charge_currency;
+
+update gcp_billing.invoice i
+set original_costs = a.original_costs
+from (
+	select seq, json_agg(json_build_object(
+		'currency', 'USD',
+		'cost', "cost",
+		'discount', discount)) original_costs
+	from gcp_billing.invoice
+	where original_costs is null
+	group by seq
+) a
+where i.seq = a.seq;
+
+-- contract
+
+ALTER TABLE gcp_billing.contract
+	ADD include_usage bool NOT NULL DEFAULT false;
+
+UPDATE gcp_billing.contract
+SET include_usage = true
+WHERE name LIKE '%kita%';

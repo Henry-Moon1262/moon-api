@@ -1,0 +1,15 @@
+steps:
+  # build image
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - .
+      - -t
+      - $_IMAGE_URL:latest
+      - -t
+      - $_IMAGE_URL:$TAG_NAME
+    timeout: 600s
+
+images:
+  - $_IMAGE_URL:latest
+  - $_IMAGE_URL:$TAG_NAME

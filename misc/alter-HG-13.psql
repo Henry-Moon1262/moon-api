@@ -1,0 +1,23 @@
+--------------------------------------------------
+-- alter
+--------------------------------------------------
+
+-- create table
+CREATE TABLE gcp_billing.user_setting
+(
+    user_seq int4 NOT NULL,
+    category varchar(50) NOT NULL,
+    "name" varchar(100) NOT NULL,
+    "data" json NOT NULL,
+    created_at timestamp NOT NULL DEFAULT now(),
+    updated_at timestamp NOT NULL DEFAULT now(),
+    CONSTRAINT user_setting_pk PRIMARY KEY (user_seq, category, name)
+);
+
+
+--------------------------------------------------
+-- rollback
+--------------------------------------------------
+
+-- drop table
+DROP TABLE gcp_billing.user_setting;

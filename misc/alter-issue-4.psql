@@ -1,0 +1,23 @@
+--------------------------------------------------
+-- alter
+--------------------------------------------------
+
+-- add type column to user table
+alter table gcp_billing.user add column "type" varchar(20) not null default 'partner';
+alter table gcp_billing.user alter "type" drop default;
+
+-- add type column to group table
+alter table gcp_billing.group add column "type" varchar(20) not null default 'partner';
+alter table gcp_billing.group alter "type" drop default;
+
+-- set proper type
+update gcp_billing.user set type = 'megazone' where email like '%@mz.co.kr';
+update gcp_billing.group set type = 'megazone' where seq in (select distinct group_seq from gcp_billing.group_permission);
+
+
+--------------------------------------------------
+-- rollback
+--------------------------------------------------
+
+-- alter table gcp_billing.user drop column "type";
+-- alter table gcp_billing.group drop column "type";

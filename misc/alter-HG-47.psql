@@ -1,0 +1,54 @@
+--------------------------------------------------
+-- alter
+--------------------------------------------------
+
+ALTER TABLE gcp_billing.account
+	ALTER COLUMN id TYPE varchar(200),
+	ALTER COLUMN "name" TYPE varchar(200);
+
+ALTER TABLE gcp_billing.service
+	ALTER COLUMN id TYPE varchar(200),
+	ALTER COLUMN "name" TYPE varchar(200);
+
+ALTER TABLE gcp_billing.project
+	ALTER COLUMN id TYPE varchar(200),
+	ALTER COLUMN "name" TYPE varchar(200);
+
+ALTER TABLE gcp_billing.sku
+	ALTER COLUMN id TYPE varchar(200),
+	ALTER COLUMN "name" TYPE varchar(200);
+
+ALTER TABLE gcp_billing.usage_daily
+	ALTER COLUMN account_id TYPE varchar(200),
+	ALTER COLUMN project_id TYPE varchar(200),
+	ALTER COLUMN service_id TYPE varchar(200),
+	ALTER COLUMN sku_id TYPE varchar(200);
+
+ALTER TABLE gcp_billing.usage_monthly
+	ALTER COLUMN account_id TYPE varchar(200),
+	ALTER COLUMN project_id TYPE varchar(200),
+	ALTER COLUMN service_id TYPE varchar(200),
+	ALTER COLUMN sku_id TYPE varchar(200);
+
+ALTER TABLE gcp_billing.credit_daily
+	ALTER COLUMN account_id TYPE varchar(200),
+	ALTER COLUMN project_id TYPE varchar(200),
+	ALTER COLUMN service_id TYPE varchar(200),
+	ALTER COLUMN sku_id TYPE varchar(200);
+
+ALTER TABLE gcp_billing.credit_monthly
+	ALTER COLUMN account_id TYPE varchar(200),
+	ALTER COLUMN project_id TYPE varchar(200),
+	ALTER COLUMN service_id TYPE varchar(200),
+	ALTER COLUMN sku_id TYPE varchar(200);
+
+ALTER TABLE gcp_billing."aggregate"
+	ALTER COLUMN account_id TYPE varchar(200);
+
+ALTER TABLE gcp_billing.group_account
+	ALTER COLUMN account_id TYPE varchar(200);
+
+--------------------------------------------------
+-- rollback
+--------------------------------------------------
+

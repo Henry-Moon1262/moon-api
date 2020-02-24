@@ -1,0 +1,52 @@
+--------------------------------------------------
+-- alter
+--------------------------------------------------
+
+-- usage_daily
+
+ALTER TABLE gcp_billing.usage_daily ADD currency_conversion_rate float8 NOT NULL DEFAULT 1;
+
+ALTER TABLE gcp_billing.usage_daily DROP CONSTRAINT usage_daily_pk;
+
+ALTER TABLE gcp_billing.usage_daily ADD CONSTRAINT usage_daily_pk PRIMARY KEY (
+	account_id, project_id, service_id, sku_id, invoice_month, location, country, region, zone,
+	cost_type, usage_unit, usage_date, currency, currency_conversion_rate,
+	t_system_machine_spec, t_system_cores, t_system_memory,
+	t_user_owner, t_user_project, t_user_server, t_user_status, t_user_user, t_user_application, t_user_name,
+	t_user_service, t_user_environment, t_user_phase, t_user_role, t_user_revision, t_user_team);
+
+-- credit_daily
+
+ALTER TABLE gcp_billing.credit_daily ADD currency_conversion_rate float8 NOT NULL DEFAULT 1;
+
+ALTER TABLE gcp_billing.credit_daily DROP CONSTRAINT credit_daily_pk;
+
+ALTER TABLE gcp_billing.credit_daily ADD CONSTRAINT credit_daily_pk PRIMARY KEY (
+	account_id, project_id, service_id, sku_id, invoice_month, usage_date, credit_name,
+	currency, currency_conversion_rate);
+
+-- account_migration
+
+CREATE TABLE gcp_billing.account_migration (
+	old_id varchar(200) NOT NULL,
+	new_id varchar(200) NOT NULL,
+	migrated_at timestamp NULL,
+	created_at timestamp NOT NULL DEFAULT now(),
+	updated_at timestamp NOT NULL DEFAULT now(),
+	CONSTRAINT account_migration_pk PRIMARY KEY (old_id)
+);
+CREATE UNIQUE INDEX account_migration_new_id_idx ON gcp_billing.account_migration USING btree (new_id);
+
+-- account_migration init
+
+/*
+insert into gcp_billing.account_migration
+select a1.id old_id, a2.id new_id
+from gcp_billing.account a1
+join gcp_billing.account a2 on a1."name" = a2."name"
+where a1.master_id='018258-6F6DDE-103860'
+	and a2.master_id='011879-06EA7C-9ADB98';
+
+insert into gcp_billing.account_migration
+values ('018258-6F6DDE-103860', '011879-06EA7C-9ADB98');
+*/

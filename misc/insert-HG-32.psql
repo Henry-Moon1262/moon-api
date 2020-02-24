@@ -1,0 +1,16 @@
+--------------------------------------------------
+-- insert
+--------------------------------------------------
+-- gcp_billing.group_permission insert
+
+-- insert into gcp_billing.group_permission (group_seq,permission_id) values (1,'account_summary.get');
+-- insert into gcp_billing.group_permission (group_seq,permission_id) values (3,'account_summary.get');
+-- commit;
+
+--------------------------------------------------
+-- delete
+--------------------------------------------------
+-- gcp_billing.group_permission delete
+
+-- delete from gcp_billing.group_permission where permission_id = 'account_summary.get';
+-- commit;

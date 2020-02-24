@@ -1,0 +1,13 @@
+steps:
+  # update deployment image
+  - name: gcr.io/cloud-builders/kubectl
+    args:
+      - set
+      - image
+      - deployment/$_DEPLOYMENT_NAME
+      - $_CONTAINER_NAME=$_IMAGE_URL:$TAG_NAME
+      - --namespace=$_CONTAINER_NAMESPACE
+      - --record
+    env:
+      - CLOUDSDK_COMPUTE_ZONE=$_COMPUTE_ZONE
+      - CLOUDSDK_CONTAINER_CLUSTER=$_CONTAINER_CLUSTER

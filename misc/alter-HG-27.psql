@@ -1,0 +1,137 @@
+--------------------------------------------------
+-- alter
+--------------------------------------------------
+
+-- email_template
+
+CREATE TABLE gcp_billing.email_template (
+	seq serial NOT NULL,
+	"name" varchar(50) NOT NULL,
+	remark varchar(1000) NOT NULL,
+	title varchar(200) NOT NULL,
+	html text NOT NULL,
+	sample_data json NOT NULL,
+	created_at timestamp NOT NULL DEFAULT now(),
+	updated_at timestamp NOT NULL DEFAULT now(),
+	CONSTRAINT email_template_pk PRIMARY KEY (seq)
+);
+
+ALTER TABLE gcp_billing.email_template ADD attachments json[] NULL;
+
+-- email_delivery
+
+CREATE TABLE gcp_billing.email_delivery (
+	seq serial NOT NULL,
+	title varchar(200) NOT NULL,
+	html text NOT NULL,
+	recipients int4[] NOT NULL,
+	status varchar(10) NOT NULL,
+	remark varchar(1000) NOT NULL,
+	send_at timestamp NOT NULL,
+	sent_at timestamp NULL,
+	created_at timestamp NOT NULL DEFAULT now(),
+	updated_at timestamp NOT NULL DEFAULT now(),
+	deleted_at timestamp NULL,
+	CONSTRAINT email_delivery_pk PRIMARY KEY (seq)
+);
+
+CREATE INDEX email_delivery_seq_idx ON gcp_billing.email_delivery USING btree (deleted_at, seq);
+CREATE INDEX email_delivery_status_idx ON gcp_billing.email_delivery USING btree (deleted_at, status, send_at);
+
+COMMENT ON COLUMN gcp_billing.email_delivery.status IS 'writing, ready, sending, sent, failed, canceled';
+
+ALTER TABLE gcp_billing.email_delivery ADD COLUMN "data" json NULL;
+ALTER TABLE gcp_billing.email_delivery ADD COLUMN attachments json[] NULL;
+
+-- setting
+
+CREATE TABLE gcp_billing.setting (
+	seq serial NOT NULL,
+	"data" json NOT NULL,
+	created_at timestamp NOT NULL DEFAULT now(),
+	CONSTRAINT setting_pk PRIMARY KEY (seq)
+);
+
+-- contract
+
+CREATE TABLE gcp_billing.contract (
+	seq serial NOT NULL,
+	"name" varchar(100) NOT NULL,
+	company varchar(100) NOT NULL,
+	accounts json[] NOT NULL,
+	discount_rate float4 NOT NULL,
+	receivers int4[] NOT NULL,
+	remark varchar(1000) NOT NULL,
+	enabled bool NOT NULL DEFAULT false,
+	created_at timestamp NOT NULL DEFAULT now(),
+	updated_at timestamp NOT NULL DEFAULT now(),
+	deleted_at timestamp NULL,
+	CONSTRAINT contract_pk PRIMARY KEY (seq)
+);
+
+-- invoice
+
+ALTER TABLE gcp_billing.invoice RENAME TO invoice_old;
+ALTER INDEX gcp_billing.invoice_pk RENAME TO invoice_old_pk;
+ALTER SEQUENCE gcp_billing.invoice_seq_seq RENAME TO invoice_old_seq_seq;
+
+CREATE TABLE gcp_billing.invoice (
+	seq bigserial NOT NULL,
+	contract_seq int4 NOT NULL,
+	invoice_month varchar(6) NOT NULL,
+	original_cost numeric NOT NULL,
+	discount numeric NULL,
+	"cost" numeric NULL,
+	exchange_rate numeric NOT NULL,
+	vat numeric NOT NULL,
+	final_cost numeric NOT NULL,
+	usage_data json NOT NULL,
+	status varchar(10) NOT NULL, -- created, confirmed
+	created_at timestamp NOT NULL DEFAULT now(),
+	updated_at timestamp NOT NULL DEFAULT now(),
+	deleted_at timestamp NULL,
+	CONSTRAINT invoice_pk PRIMARY KEY (seq)
+);
+
+
+--------------------------------------------------
+-- rollback
+--------------------------------------------------
+
+-- DROP TABLE gcp_billing.email_template;
+-- DROP TABLE gcp_billing.setting;
+
+-- DROP TABLE gcp_billing.invoice;
+
+-- ALTER TABLE gcp_billing.invoice_old RENAME TO invoice;
+-- ALTER INDEX gcp_billing.invoice_old_pk RENAME TO invoice_pk;
+
+
+--------------------------------------------------
+-- helpers
+--------------------------------------------------
+
+-- create contracts from account and groups
+
+insert into gcp_billing.contract
+	(name, company, accounts, discount_rate, receivers, remark)
+select
+	replace(replace(name, '_Megazone', ''), ' - Megazone', '') "name",
+	replace(replace(name, '_Megazone', ''), ' - Megazone', '') company,
+	array(
+		select json_build_object(
+		'id', id, 'type', 'all', 'projects', json_build_array())
+	) accounts,
+	0 discount_rate,
+	array(
+		select distinct gu.user_seq
+		from gcp_billing.group_account ga
+		join gcp_billing.group_user gu on ga.group_seq = gu.group_seq
+		join gcp_billing."group" g on g.seq = gu.group_seq
+		where ga.account_id = id and g."type" = 'partner'
+	) receivers,
+	'' remark
+from gcp_billing.account;
+
+-- truncate table gcp_billing.contract;
+-- truncate table gcp_billing.invoice;

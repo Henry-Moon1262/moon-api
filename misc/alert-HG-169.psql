@@ -1,0 +1,14 @@
+--------------------------------------------------
+-- alter
+--------------------------------------------------
+
+-- usage_monthly
+
+ALTER TABLE gcp_billing.usage_monthly
+	ADD cost_in_usd float8 NOT NULL DEFAULT 0,
+	ADD credit_in_usd float8 NOT NULL DEFAULT 0;
+
+-- credit_monthly
+
+ALTER TABLE gcp_billing.credit_monthly
+	ADD credit_in_usd float8 NOT NULL DEFAULT 0;

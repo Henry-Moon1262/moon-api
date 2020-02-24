@@ -1,0 +1,22 @@
+steps:
+  # build image
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      ["build", ".", "-t", "$_IMAGE_URL:latest", "-t", "$_IMAGE_URL:$SHORT_SHA"]
+    timeout: 600s
+
+  # push image
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      ["push", "$_IMAGE_URL:$SHORT_SHA"]
+
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      ["push", "$_IMAGE_URL:latest"]
+
+  # change image
+  - name: "gcr.io/cloud-builders/kubectl"
+    args: ["--record", "deployment.apps/$_RC_NAME", "set", "image", "deployment.v1.apps/$_RC_NAME", "$_CONTAINER_NAME=$_IMAGE_URL:$SHORT_SHA"]
+    env:
+      - "CLOUDSDK_COMPUTE_ZONE=$_ZONE"
+      - "CLOUDSDK_CONTAINER_CLUSTER=$_CLUSTER"

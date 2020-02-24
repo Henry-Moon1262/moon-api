@@ -1,0 +1,34 @@
+--------------------------------------------------
+-- alter
+--------------------------------------------------
+
+-- create table
+CREATE TABLE gcp_billing.exchange_rate
+(
+    "month" varchar(7) NOT NULL,
+    "date" date NOT NULL,
+    country varchar(100) NOT NULL,
+    code varchar(3) NOT NULL,
+    buy_rate numeric(30,10) NOT NULL,
+    buy_spread numeric(30,10) NOT NULL,
+    sell_rate numeric(30,10) NOT NULL,
+    sell_spread numeric(30,10) NOT NULL,
+    send_rate numeric(30,10) NOT NULL,
+    receive_rate numeric(30,10) NOT NULL,
+    buy_check_rate numeric(30,10) NOT NULL,
+    sell_check_rate numeric(30,10) NOT NULL,
+    basic_rate numeric(30,10) NOT NULL,
+    commission_rate numeric(30,10) NOT NULL,
+    usd_rate numeric(30,10) NOT NULL,
+    created_at timestamp NOT NULL DEFAULT now(),
+    updated_at timestamp NOT NULL DEFAULT now(),
+    CONSTRAINT exchange_rate_pk PRIMARY KEY (month, code)
+);
+
+
+--------------------------------------------------
+-- rollback
+--------------------------------------------------
+
+-- delete table
+DROP TABLE gcp_billing.exchange_rate;

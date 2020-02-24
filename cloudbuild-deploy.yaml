@@ -1,0 +1,7 @@
+steps:
+  # rolling update
+  - name: "gcr.io/cloud-builders/kubectl"
+    args: ["rolling-update", $_RC_NAME, "--image=$_IMAGE_URL:$TAG_NAME"]
+    env:
+      - "CLOUDSDK_COMPUTE_ZONE=$_ZONE"
+      - "CLOUDSDK_CONTAINER_CLUSTER=$_CLUSTER"

@@ -1,0 +1,12 @@
+--------------------------------------------------
+-- alter
+--------------------------------------------------
+
+-- add loggedin_at column to user table
+alter table gcp_billing.user add column "loggedin_at" timestamp not null default now();
+
+--------------------------------------------------
+-- rollback
+--------------------------------------------------
+
+-- alter table gcp_billing.user drop column "loggedin_at";

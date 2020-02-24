@@ -1,0 +1,25 @@
+steps:
+  # build image
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - .
+      - --tag=$_IMAGE_URL:latest
+    timeout: 600s
+
+  # push image
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - $_IMAGE_URL:latest
+
+  # delete pods (for restart)
+  - name: gcr.io/cloud-builders/kubectl
+    args:
+      - delete
+      - pods
+      - --namespace=$_CONTAINER_NAMESPACE
+      - --selector=app=$_DEPLOYMENT_NAME
+    env:
+      - CLOUDSDK_COMPUTE_ZONE=$_COMPUTE_ZONE
+      - CLOUDSDK_CONTAINER_CLUSTER=$_CONTAINER_CLUSTER

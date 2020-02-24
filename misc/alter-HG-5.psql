@@ -1,0 +1,31 @@
+--------------------------------------------------
+-- alter
+--------------------------------------------------
+
+-- alter table gcp_billing.original_invoice
+
+DROP TABLE gcp_billing.gcp_invoice;
+DROP TABLE gcp_billing.gcp_invoice_item;
+
+CREATE TABLE gcp_billing.original_invoice (
+	id varchar(100) NOT NULL,
+	invoice_month varchar(6) NOT NULL,
+	"type" varchar(20) NOT NULL,
+	currency varchar(3) NOT NULL,
+	"cost" numeric NOT NULL,
+	meta json NOT NULL,
+	items json[] NOT NULL,
+	summary json NOT NULL,
+	issued_date date NOT NULL,
+	due_date date NOT NULL,
+	created_at timestamp NOT NULL DEFAULT now(),
+	CONSTRAINT original_invoice_pk PRIMARY KEY (id)
+);
+
+CREATE UNIQUE INDEX original_invoice_invoice_month_idx
+    ON gcp_billing.original_invoice USING btree (invoice_month);
+
+
+--------------------------------------------------
+-- rollback
+--------------------------------------------------

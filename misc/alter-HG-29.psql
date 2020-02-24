@@ -1,0 +1,14 @@
+--------------------------------------------------
+-- alter
+--------------------------------------------------
+
+-- alter table gcp_billing.usage_daily
+
+CREATE INDEX usage_daily_account_id_usage_date_idx ON gcp_billing.usage_daily USING btree (account_id, usage_date);
+
+--------------------------------------------------
+-- rollback
+--------------------------------------------------
+
+DROP INDEX gcp_billing.usage_daily_account_id_usage_date_idx;
+
